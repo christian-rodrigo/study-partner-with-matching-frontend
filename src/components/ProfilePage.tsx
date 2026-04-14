@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Edit3, Save, X, GraduationCap, MapPin, Languages, Clock3 } from 'lucide-react';
 import { api } from '../lib/api';
 import type {
@@ -90,7 +90,7 @@ function InfoCard({
 }: {
   title: string;
   value?: string | number | null;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <div
@@ -133,7 +133,7 @@ function InfoCard({
   );
 }
 
-function Tag({ children }: { children: React.ReactNode }) {
+function Tag({ children }: { children: ReactNode }) {
   return (
     <span
       style={{
