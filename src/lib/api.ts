@@ -88,11 +88,11 @@ export const api = {
 
   // ⭐ NEU: Profil bearbeiten
   async updateMyProfile(payload: {
-    name: string;
-    universityId: number;
-    city: string;
-    degreeProgram: string;
-    semester: number;
+    name?: string;
+    universityId?: number;
+    city?: string;
+    degreeProgram?: string;
+    semester?: number;
     bio?: string;
     language?: string;
     availableTime?: string;
@@ -102,7 +102,7 @@ export const api = {
     studyFrequency?: string;
   }) {
     return request<User>('/api/users/me', {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(payload),
     });
   },

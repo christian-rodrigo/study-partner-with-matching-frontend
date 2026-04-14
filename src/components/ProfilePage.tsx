@@ -48,6 +48,10 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
     studyFrequency: "",
   });
 
+  const [originalForm, setOriginalForm] = useState<typeof form | null>(null);
+
+
+
   useEffect(() => {
     void loadData();
   }, []);
@@ -63,6 +67,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
       setUniversities(universityList);
 
       setForm(toForm(profile));
+      setOriginalForm(toForm(profile));
     } catch (e) {
       console.error("Failed to load profile", e);
     }
@@ -83,12 +88,22 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
   }
 
   async function handleSave() {
+    if (!originalForm) return;
+
     try {
       setSaving(true);
 
-      console.log("PROFILE PAYLOAD", form);
+      const payload: any = {};
 
-      await api.updateMyProfile(form);
+      for (const key in form) {
+        if (form[key as keyof typeof form] !== originalForm[key as keyof typeof form]) {
+          payload[key] = form[key as keyof typeof form];
+        }
+      }
+
+      console.log("PATCH PAYLOAD", payload);
+
+      await api.updateMyProfile(payload);
 
       await loadData();
       setEditMode(false);
