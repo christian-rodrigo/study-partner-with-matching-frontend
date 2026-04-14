@@ -1,7 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Edit3, Save, X, GraduationCap, MapPin, Languages, Clock3 } from 'lucide-react';
 import { api } from '../lib/api';
-import type { RegisterRequest, University, User } from '../lib/types';
+import type {
+  RegisterRequest,
+  University,
+  User,
+  City,
+} from '../lib/types';
+import {
+  STUDY_MODE_VALUES,
+  LEARNING_STYLE_VALUES,
+  LEARNING_GOAL_VALUES,
+  STUDY_FREQUENCY_VALUES,
+} from '../lib/types';
 import { formatLabel } from '../lib/utils';
 
 interface ProfilePageProps {
@@ -10,10 +21,10 @@ interface ProfilePageProps {
 
 type ProfileForm = {
   name: string;
-  universityId: number;
-  city: string;
+  universityId?: number;
+  city?: City;
   degreeProgram: string;
-  semester: number;
+  semester?: number;
   bio: string;
   language: string;
   availableTime: string;
@@ -23,7 +34,7 @@ type ProfileForm = {
   studyFrequency?: RegisterRequest['studyFrequency'];
 };
 
-const cities = ['BERLIN', 'COLOGNE', 'DORTMUND', 'HAMBURG', 'MUNICH'];
+const cities: City[] = ['BERLIN', 'COLOGNE', 'DORTMUND', 'HAMBURG', 'MUNICH'];
 
 const degreePrograms = [
   'Computer Science',
@@ -37,18 +48,35 @@ const degreePrograms = [
 
 const emptyForm: ProfileForm = {
   name: '',
-  universityId: 0,
-  city: 'BERLIN',
-  degreeProgram: degreePrograms[0],
-  semester: 1,
+  universityId: undefined,
+  city: undefined,
+  degreeProgram: '',
+  semester: undefined,
   bio: '',
   language: '',
   availableTime: '',
-  studyMode: 'BOTH',
-  learningStyle: 'GROUP',
-  learningGoal: 'EXAM_PREPARATION',
-  studyFrequency: 'TWICE_A_WEEK',
+  studyMode: undefined,
+  learningStyle: undefined,
+  learningGoal: undefined,
+  studyFrequency: undefined,
 };
+
+function buildForm(user: User): ProfileForm {
+  return {
+    name: user.name ?? '',
+    universityId: user.universityId,
+    city: user.city as City | undefined,
+    degreeProgram: user.degreeProgram ?? '',
+    semester: user.semester,
+    bio: user.bio ?? '',
+    language: user.language ?? '',
+    availableTime: user.availableTime ?? '',
+    studyMode: user.studyMode,
+    learningStyle: user.learningStyle,
+    learningGoal: user.learningGoal,
+    studyFrequency: user.studyFrequency,
+  };
+}
 
 function getAvatarUrl(user?: User | null) {
   if (!user) return '';
@@ -99,7 +127,7 @@ function InfoCard({
           lineHeight: 1.35,
         }}
       >
-        {value || '—'}
+        {value}
       </div>
     </div>
   );
@@ -129,6 +157,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
   const [profile, setProfile] = useState<User | null>(null);
   const [universities, setUniversities] = useState<University[]>([]);
   const [form, setForm] = useState<ProfileForm>(emptyForm);
+  const [originalForm, setOriginalForm] = useState<ProfileForm | null>(null);
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -143,23 +172,12 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
 
       try {
         const [me, universityData] = await Promise.all([api.me(), api.getUniversities()]);
+        const loadedForm = buildForm(me);
+
         setProfile(me);
         setUniversities(universityData);
-
-        setForm({
-          name: me.name || '',
-          universityId: me.universityId || universityData[0]?.id || 0,
-          city: me.city || 'BERLIN',
-          degreeProgram: me.degreeProgram || degreePrograms[0],
-          semester: me.semester || 1,
-          bio: me.bio || '',
-          language: me.language || '',
-          availableTime: me.availableTime || '',
-          studyMode: me.studyMode || 'BOTH',
-          learningStyle: me.learningStyle || 'GROUP',
-          learningGoal: me.learningGoal || 'EXAM_PREPARATION',
-          studyFrequency: me.studyFrequency || 'TWICE_A_WEEK',
-        });
+        setForm(loadedForm);
+        setOriginalForm(loadedForm);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load profile.');
       } finally {
@@ -173,48 +191,42 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
   const handleCancel = () => {
     if (!profile) return;
 
-    setForm({
-      name: profile.name || '',
-      universityId: profile.universityId || universities[0]?.id || 0,
-      city: profile.city || 'BERLIN',
-      degreeProgram: profile.degreeProgram || degreePrograms[0],
-      semester: profile.semester || 1,
-      bio: profile.bio || '',
-      language: profile.language || '',
-      availableTime: profile.availableTime || '',
-      studyMode: profile.studyMode || 'BOTH',
-      learningStyle: profile.learningStyle || 'GROUP',
-      learningGoal: profile.learningGoal || 'EXAM_PREPARATION',
-      studyFrequency: profile.studyFrequency || 'TWICE_A_WEEK',
-    });
-
+    const resetForm = buildForm(profile);
+    setForm(resetForm);
+    setOriginalForm(resetForm);
     setEditing(false);
     setError('');
   };
 
   const handleSave = async () => {
+    if (!originalForm) return;
+
     setBusy(true);
     setError('');
 
     try {
-      await api.updateMyProfile({
-        name: form.name,
-        universityId: form.universityId,
-        city: form.city,
-        degreeProgram: form.degreeProgram,
-        semester: form.semester,
-        bio: form.bio,
-        language: form.language,
-        availableTime: form.availableTime,
-        studyMode: form.studyMode,
-        learningStyle: form.learningStyle,
-        learningGoal: form.learningGoal,
-        studyFrequency: form.studyFrequency,
-      });
+      const payload: Partial<Record<keyof ProfileForm, any>> = {};
+      for (const key of Object.keys(form) as (keyof ProfileForm)[]) {
+        if (form[key] !== originalForm[key]) {
+          payload[key] = form[key];
+        }
+      }
+
+      if (Object.keys(payload).length === 0) {
+        setEditing(false);
+        return;
+      }
+
+      await api.updateMyProfile(payload);
 
       const me = await api.me();
+      const updatedForm = buildForm(me);
+
       setProfile(me);
+      setForm(updatedForm);
+      setOriginalForm(updatedForm);
       setEditing(false);
+
       await onProfileUpdated();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile.');
@@ -288,9 +300,9 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                 marginBottom: '10px',
               }}
             >
-              <Tag>{profile.universityName || 'No university'}</Tag>
-              <Tag>{profile.degreeProgram || 'No degree program'}</Tag>
-              <Tag>Semester {profile.semester || '—'}</Tag>
+              <Tag>{profile.universityName}</Tag>
+              <Tag>{profile.degreeProgram}</Tag>
+              <Tag>Semester {profile.semester}</Tag>
             </div>
 
             <p
@@ -302,7 +314,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                 lineHeight: 1.6,
               }}
             >
-              {profile.bio || 'No bio yet.'}
+              {profile.bio}
             </p>
           </div>
 
@@ -415,7 +427,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                   minHeight: '84px',
                 }}
               >
-                {profile.bio || 'No bio yet.'}
+                {profile.bio}
               </div>
             </div>
 
@@ -448,14 +460,12 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                   gap: '12px',
                 }}
               >
-                {profile.city && (
-                  <Tag>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                      <MapPin size={14} />
-                      {profile.city}
-                    </span>
-                  </Tag>
-                )}
+                <Tag>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <MapPin size={14} />
+                    {profile.city}
+                  </span>
+                </Tag>
 
                 {profile.language && (
                   <Tag>
@@ -508,16 +518,23 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 style={inputStyle}
+                placeholder="Enter your name"
               />
             </label>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700 }}>University</span>
               <select
-                value={form.universityId}
-                onChange={(e) => setForm({ ...form, universityId: Number(e.target.value) })}
+                value={form.universityId ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    universityId: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
                 style={inputStyle}
               >
+                <option value="">Select university</option>
                 {universities.map((university) => (
                   <option key={university.id} value={university.id}>
                     {university.name}
@@ -529,13 +546,19 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700 }}>City</span>
               <select
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                value={form.city ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    city: e.target.value ? (e.target.value as City) : undefined,
+                  })
+                }
                 style={inputStyle}
               >
+                <option value="">Select city</option>
                 {cities.map((city) => (
                   <option key={city} value={city}>
-                    {city}
+                    {formatLabel(city)}
                   </option>
                 ))}
               </select>
@@ -546,9 +569,15 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
               <input
                 type="number"
                 min="1"
-                value={form.semester}
-                onChange={(e) => setForm({ ...form, semester: Number(e.target.value) })}
+                value={form.semester ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    semester: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
                 style={inputStyle}
+                placeholder="Enter semester"
               />
             </label>
 
@@ -559,6 +588,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                 onChange={(e) => setForm({ ...form, degreeProgram: e.target.value })}
                 style={inputStyle}
               >
+                <option value="">Select degree program</option>
                 {degreePrograms.map((program) => (
                   <option key={program} value={program}>
                     {program}
@@ -573,7 +603,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                 value={form.language}
                 onChange={(e) => setForm({ ...form, language: e.target.value })}
                 style={inputStyle}
-                placeholder="English"
+                placeholder="Enter language"
               />
             </label>
 
@@ -583,81 +613,99 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                 value={form.availableTime}
                 onChange={(e) => setForm({ ...form, availableTime: e.target.value })}
                 style={inputStyle}
-                placeholder="Evenings"
+                placeholder="Enter available time"
               />
             </label>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700 }}>Study Mode</span>
               <select
-                value={form.studyMode || ''}
+                value={form.studyMode ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    studyMode: e.target.value as RegisterRequest['studyMode'],
+                    studyMode: e.target.value
+                      ? (e.target.value as RegisterRequest['studyMode'])
+                      : undefined,
                   })
                 }
                 style={inputStyle}
               >
-                <option value="ONLINE">ONLINE</option>
-                <option value="OFFLINE">OFFLINE</option>
-                <option value="BOTH">BOTH</option>
+                <option value="">Select study mode</option>
+                {STUDY_MODE_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {formatLabel(value)}
+                  </option>
+                ))}
               </select>
             </label>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700 }}>Learning Style</span>
               <select
-                value={form.learningStyle || ''}
+                value={form.learningStyle ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    learningStyle: e.target.value as RegisterRequest['learningStyle'],
+                    learningStyle: e.target.value
+                      ? (e.target.value as RegisterRequest['learningStyle'])
+                      : undefined,
                   })
                 }
                 style={inputStyle}
               >
-                <option value="SOLO">SOLO</option>
-                <option value="GROUP">GROUP</option>
-                <option value="FLEXIBLE">FLEXIBLE</option>
+                <option value="">Select learning style</option>
+                {LEARNING_STYLE_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {formatLabel(value)}
+                  </option>
+                ))}
               </select>
             </label>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700 }}>Learning Goal</span>
               <select
-                value={form.learningGoal || ''}
+                value={form.learningGoal ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    learningGoal: e.target.value as RegisterRequest['learningGoal'],
+                    learningGoal: e.target.value
+                      ? (e.target.value as RegisterRequest['learningGoal'])
+                      : undefined,
                   })
                 }
                 style={inputStyle}
               >
-                <option value="EXAM_PREPARATION">EXAM PREPARATION</option>
-                <option value="HOMEWORK">HOMEWORK</option>
-                <option value="LONG_TERM_UNDERSTANDING">LONG TERM UNDERSTANDING</option>
-                <option value="PROJECT_WORK">PROJECT WORK</option>
+                <option value="">Select learning goal</option>
+                {LEARNING_GOAL_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {formatLabel(value)}
+                  </option>
+                ))}
               </select>
             </label>
 
             <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '14px', fontWeight: 700 }}>Study Frequency</span>
               <select
-                value={form.studyFrequency || ''}
+                value={form.studyFrequency ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    studyFrequency: e.target.value as RegisterRequest['studyFrequency'],
+                    studyFrequency: e.target.value
+                      ? (e.target.value as RegisterRequest['studyFrequency'])
+                      : undefined,
                   })
                 }
                 style={inputStyle}
               >
-                <option value="DAILY">DAILY</option>
-                <option value="TWICE_A_WEEK">TWICE A WEEK</option>
-                <option value="WEEKLY">WEEKLY</option>
-                <option value="FLEXIBLE">FLEXIBLE</option>
+                <option value="">Select study frequency</option>
+                {STUDY_FREQUENCY_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {formatLabel(value)}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -681,6 +729,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                   padding: '14px',
                   resize: 'vertical',
                 }}
+                placeholder="Tell others about yourself"
               />
             </label>
           </div>

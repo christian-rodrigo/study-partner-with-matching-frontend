@@ -1,10 +1,35 @@
 export type UserType = 'STUDENT' | 'TUTOR';
-export type StudyMode = 'ONLINE' | 'OFFLINE' | 'BOTH';
-export type LearningStyle = 'QUIET' | 'GROUP' | 'EXAM_FOCUSED';
-export type LearningGoal = 'EXAM_PREPARATION' | 'HOMEWORK' | 'REGULAR_STUDY';
-export type StudyFrequency = 'DAILY' | 'TWICE_A_WEEK' | 'WEEKENDS' | 'BEFORE_EXAMS';
 export type City = 'BERLIN' | 'COLOGNE' | 'DORTMUND' | 'HAMBURG' | 'MUNICH';
 export type LearningPlaceType = 'LIBRARY' | 'CAFE' | 'UNIVERSITY' | 'COWORKING';
+
+export type StudyMode = 'ONLINE' | 'OFFLINE' | 'BOTH';
+export const STUDY_MODE_VALUES: StudyMode[] = [
+  'ONLINE',
+  'OFFLINE',
+  'BOTH'
+];
+
+export type LearningStyle = 'QUIET' | 'GROUP' | 'EXAM_FOCUSED';
+export const LEARNING_STYLE_VALUES: LearningStyle[] = [
+  'QUIET',
+  'GROUP',
+  'EXAM_FOCUSED'
+];
+
+export type LearningGoal = 'EXAM_PREPARATION' | 'HOMEWORK' | 'REGULAR_STUDY';
+export const LEARNING_GOAL_VALUES: LearningGoal[] = [
+  'EXAM_PREPARATION',
+  'HOMEWORK',
+  'REGULAR_STUDY'
+];
+
+export type StudyFrequency = 'DAILY' | 'TWICE_A_WEEK' | 'WEEKENDS' | 'BEFORE_EXAMS';
+export const STUDY_FREQUENCY_VALUES: StudyFrequency[] = [
+  'DAILY',
+  'TWICE_A_WEEK',
+  'WEEKENDS',
+  'BEFORE_EXAMS'
+];
 
 export interface University {
   id: number;
@@ -89,12 +114,13 @@ export interface RegisterRequest {
   city: string;
   degreeProgram: string;
   semester: number;
-  bio: string;
-  language: string;
-  availableTime: string;
-  studyMode: StudyMode;
-  learningStyle: LearningStyle;
-  learningGoal: LearningGoal;
-  studyFrequency: StudyFrequency;
+
+  bio?: string;
+  language?: string;
+  availableTime?: string;
+  studyMode?: StudyMode;
+  learningStyle?: LearningStyle;
+  learningGoal?: LearningGoal;
+  studyFrequency?: StudyFrequency;
   userType: UserType;
 }

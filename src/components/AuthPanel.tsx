@@ -19,19 +19,19 @@ const degreePrograms = [
 
 const initialRegister: RegisterRequest = {
   email: 'r@gmail.com',
-  password: '123',
+  password: '1234',
   name: 'Ramy',
   universityId: 0,
   city: 'BERLIN',
   degreeProgram: degreePrograms[0],
   semester: 1,
-  bio: 'Hallo Leute',
-  language: 'English',
-  availableTime: 'Evenings',
-  studyMode: 'BOTH',
-  learningStyle: 'GROUP',
-  learningGoal: 'EXAM_PREPARATION',
-  studyFrequency: 'TWICE_A_WEEK',
+  bio: '',
+  language: '',
+  availableTime: '',
+  studyMode: 'ONLINE',
+  learningStyle: undefined,
+  learningGoal: undefined,
+  studyFrequency: undefined,
   userType: 'STUDENT',
 };
 
@@ -99,7 +99,7 @@ export function AuthPanel({ onLogin, onRegister }: AuthPanelProps) {
           padding: '32px',
           borderRadius: '20px',
           boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
-          backgroundColor:'#def3ffff', 
+          backgroundColor: '#def3ffff',
         }}
       >
         <div style={{ marginBottom: '24px' }}>
