@@ -102,6 +102,7 @@ function InfoCard({
         borderRadius: '22px',
         padding: '18px',
         boxShadow: '0 10px 24px rgba(15, 23, 42, 0.06)',
+        
       }}
     >
       <div
@@ -113,6 +114,7 @@ function InfoCard({
           color: '#64748b',
           fontSize: '14px',
           fontWeight: 700,
+  
         }}
       >
         {icon}
@@ -276,6 +278,7 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
               backgroundPosition: 'center',
               boxShadow: '0 18px 34px rgba(59, 130, 246, 0.18)',
               border: '4px solid rgba(255,255,255,0.7)',
+              backgroundColor: '#e6ceffff',
             }}
           />
 
