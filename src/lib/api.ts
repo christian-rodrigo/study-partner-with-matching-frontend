@@ -74,7 +74,6 @@ export const api = {
   async getDiscoverUsers(userId: number) {
     return request<User[]>(`/api/discover/${userId}`);
   },
-
   async register(payload: RegisterRequest) {
     return request<User>('/api/auth/register', {
       method: 'POST',

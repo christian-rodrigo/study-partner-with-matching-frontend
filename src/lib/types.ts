@@ -27,6 +27,8 @@ export interface User {
   learningStyle?: LearningStyle;
   learningGoal?: LearningGoal;
   studyFrequency?: StudyFrequency;
+  score?: number;
+  photos?: string[];
 }
 
 export interface AuthResponse {
