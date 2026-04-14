@@ -38,20 +38,19 @@ export interface AuthResponse {
 
 export interface Conversation {
   id: number;
-  user1Id: number;
-  user1Name: string;
-  user2Id: number;
-  user2Name: string;
-  createdAt: string;
+  user1?: User;
+  user2?: User;
+  createdAt?: string;
+  updatedAt?: string;
+  lastMessageAt?: string;
 }
 
 export interface Message {
   id: number;
-  conversationId: number;
-  senderId: number;
-  senderName: string;
   content: string;
-  createdAt: string;
+  senderId: number;
+  createdAt?: string;
+  sentAt?: string;
 }
 
 export interface LearningPlace {
