@@ -54,6 +54,7 @@ export interface User {
   studyFrequency?: StudyFrequency;
   score?: number;
   photos?: string[];
+  avatarSeed?: string;
 }
 
 export interface AuthResponse {

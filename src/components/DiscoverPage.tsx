@@ -49,7 +49,9 @@ export function DiscoverPage({ currentUser, onStartChat }: DiscoverPageProps) {
   const currentUserCard = cards[currentIndex];
 
   const imageUrl = currentUserCard
-    ? `https://api.dicebear.com/7.x/adventurer/svg?seed=${currentUserCard.id}`
+    ? `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(
+      currentUserCard.avatarSeed || `${currentUserCard.id}-${currentUserCard.name}`
+    )}`
     : '';
 
   return (

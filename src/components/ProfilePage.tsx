@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { Edit3, Save, X, GraduationCap, MapPin, Languages, Clock3 } from 'lucide-react';
+import { Edit3, Save, X, GraduationCap, MapPin, Languages, Clock3, Camera } from 'lucide-react';
 import { api } from '../lib/api';
+
 import type {
   RegisterRequest,
   University,
@@ -32,6 +33,7 @@ type ProfileForm = {
   learningStyle?: RegisterRequest['learningStyle'];
   learningGoal?: RegisterRequest['learningGoal'];
   studyFrequency?: RegisterRequest['studyFrequency'];
+  avatarSeed?: string;
 };
 
 const cities: City[] = ['BERLIN', 'COLOGNE', 'DORTMUND', 'HAMBURG', 'MUNICH'];
@@ -75,12 +77,14 @@ function buildForm(user: User): ProfileForm {
     learningStyle: user.learningStyle,
     learningGoal: user.learningGoal,
     studyFrequency: user.studyFrequency,
+    avatarSeed: user.avatarSeed,
   };
 }
 
 function getAvatarUrl(user?: User | null) {
   if (!user) return '';
-  return `https://api.dicebear.com/7.x/adventurer/svg?seed=${user.id}-${user.name}`;
+  const seed = user.avatarSeed || `${user.id}-${user.name}`;
+  return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}&t=${Date.now()}`;
 }
 
 function InfoCard({
@@ -102,7 +106,7 @@ function InfoCard({
         borderRadius: '22px',
         padding: '18px',
         boxShadow: '0 10px 24px rgba(15, 23, 42, 0.06)',
-        
+
       }}
     >
       <div
@@ -114,7 +118,7 @@ function InfoCard({
           color: '#64748b',
           fontSize: '14px',
           fontWeight: 700,
-  
+
         }}
       >
         {icon}
@@ -165,7 +169,9 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const avatarUrl = useMemo(() => getAvatarUrl(profile), [profile]);
+  const avatarUrl = getAvatarUrl(
+    editing && profile ? { ...profile, avatarSeed: form.avatarSeed } : profile
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -268,8 +274,10 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
             alignItems: 'center',
           }}
         >
+
           <div
             style={{
+              position: 'relative',
               width: '140px',
               height: '140px',
               borderRadius: '28px',
@@ -280,7 +288,35 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
               border: '4px solid rgba(255,255,255,0.7)',
               backgroundColor: '#e6ceffff',
             }}
-          />
+          >
+            {editing && (
+              <button
+                type="button"
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    avatarSeed: crypto.randomUUID(),
+                  }))
+                }
+                style={{
+                  position: 'absolute',
+                  bottom: '8px',
+                  right: '8px',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.7)',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <Camera size={18} color="white" />
+              </button>
+            )}
+          </div>
 
           <div>
             <span className="eyebrow">Profile</span>
@@ -323,21 +359,23 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
 
           <div style={{ display: 'flex', gap: '10px', alignSelf: 'start' }}>
             {!editing ? (
-              <button
-                className="secondary-button"
-                onClick={() => setEditing(true)}
-                style={{
-                  height: '44px',
-                  borderRadius: '14px',
-                  padding: '0 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                <Edit3 size={16} />
-                Edit Profile
-              </button>
+              <>
+                <button
+                  className="secondary-button"
+                  onClick={() => setEditing(true)}
+                  style={{
+                    height: '44px',
+                    borderRadius: '14px',
+                    padding: '0 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Edit3 size={16} />
+                  Edit Profile
+                </button>
+              </>
             ) : (
               <>
                 <button
@@ -373,6 +411,8 @@ export function ProfilePage({ onProfileUpdated }: ProfilePageProps) {
                   <Save size={16} />
                   {busy ? 'Saving…' : 'Save'}
                 </button>
+
+
               </>
             )}
           </div>
@@ -751,3 +791,4 @@ const inputStyle: React.CSSProperties = {
   background: 'rgba(255,255,255,0.88)',
   outline: 'none',
 };
+
