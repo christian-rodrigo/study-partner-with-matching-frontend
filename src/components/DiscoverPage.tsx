@@ -294,7 +294,7 @@ export function DiscoverPage({ currentUser, onStartChat }: DiscoverPageProps) {
               }}
             >
               <div className="pill" style={{ marginBottom: '10px' }}>
-                Top Match · {currentUserCard.score}
+                {currentUserCard.score}% Match
               </div>
 
               <h2 style={{ margin: 0 }}>{currentUserCard.name}</h2>
