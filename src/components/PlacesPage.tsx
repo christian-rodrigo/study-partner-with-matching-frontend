@@ -61,6 +61,11 @@ export function PlacesPage({ initialPlaces }: PlacesPageProps) {
       <div className="cards-grid">
         {places.map((place) => (
           <article key={place.id} className="card stack-sm">
+            <img
+              src={place.imageUrl}
+              alt={place.name}
+              className="place-image"
+            />
             <h3>{place.name}</h3>
             <p>{place.address}</p>
             <div className="pill-row">
