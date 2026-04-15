@@ -211,8 +211,10 @@ export function DiscoverPage({ currentUser, onStartChat }: DiscoverPageProps) {
               overflow: 'hidden',
               position: 'relative',
               backgroundImage: `url(${imageUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundColor: '#e6ceffff',
+              backgroundPosition: 'center 20%',
               boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
             }}
           >

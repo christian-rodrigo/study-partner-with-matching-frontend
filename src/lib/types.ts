@@ -63,11 +63,11 @@ export interface AuthResponse {
 
 export interface Conversation {
   id: number;
-  user1?: User;
-  user2?: User;
+  user1Id: number;
+  user1Name: string;
+  user2Id: number;
+  user2Name: string;
   createdAt?: string;
-  updatedAt?: string;
-  lastMessageAt?: string;
 }
 
 export interface Message {

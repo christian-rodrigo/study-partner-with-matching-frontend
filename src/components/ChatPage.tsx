@@ -19,10 +19,10 @@ function formatTime(value?: string) {
 }
 
 function getOtherParticipantName(conversation: Conversation, currentUser: User) {
-  if (conversation.user1?.id === currentUser.id) {
-    return conversation.user2?.name || 'Unknown';
+  if (conversation.user1Id === currentUser.id) {
+    return conversation.user2Name || 'Unknown';
   }
-  return conversation.user1?.name || 'Unknown';
+  return conversation.user1Name || 'Unknown';
 }
 
 function getInitial(name: string) {
@@ -107,8 +107,6 @@ export function ChatPage({
             const isActive = conversation.id === selectedConversationId;
             const partnerName = getOtherParticipantName(conversation, currentUser);
             const lastTimestamp =
-              conversation.updatedAt ||
-              conversation.lastMessageAt ||
               conversation.createdAt;
 
             return (
