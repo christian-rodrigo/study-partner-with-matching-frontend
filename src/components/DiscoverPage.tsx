@@ -57,139 +57,167 @@ export function DiscoverPage({ currentUser, onStartChat }: DiscoverPageProps) {
   return (
     <section className="stack-lg">
       <div
-        className="card"
         style={{
-          padding: '18px 20px',
-          borderRadius: '24px',
-          background: 'rgba(255,255,255,0.78)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          boxShadow: '0 12px 30px rgba(15, 23, 42, 0.08)',
-          border: '1px solid rgba(255,255,255,0.35)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          marginTop: '-103px',
         }}
       >
         <div
-          className="section-header"
           style={{
-            marginBottom: '14px',
+            marginBottom: '2px',
           }}
         >
-          <div>
-            <span className="eyebrow">Discover</span>
-            <h2 style={{ margin: '6px 0 0 0', fontSize: '28px' }}>Find study partners</h2>
-          </div>
+          <span className="eyebrow">DISCOVER</span>
+          <h2
+            style={{
+              margin: '6px 0 6px 0',
+              fontSize: '28px',
+              lineHeight: 1.05,
+            }}
+          >
+            Find study partners
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              fontSize: '15px',
+              color: '#64748b',
+            }}
+          >
+            Search for students by keyword, city and study mode.
+          </p>
         </div>
 
         <div
-          className="grid-4"
           style={{
-            gap: '12px',
-            alignItems: 'end',
+            padding: '22px 30px',
+            borderRadius: '30px',
+            background: 'rgba(255,255,255,0.62)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: '0 10px 28px rgba(15, 23, 42, 0.08)',
+            border: '1px solid rgba(255,255,255,0.35)',
           }}
         >
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 700 }}>Keyword</span>
-            <input
-              value={filter.keyword || ''}
-              onChange={(e) => setFilter({ ...filter, keyword: e.target.value })}
-              placeholder="bio or degree"
-              style={{
-                height: '46px',
-                fontSize: '15px',
-                padding: '0 14px',
-                borderRadius: '14px',
-                border: '1px solid #cbd5e1',
-                background: 'rgba(255,255,255,0.72)',
-                outline: 'none',
-              }}
-            />
-          </label>
-
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 700 }}>City</span>
-            <input
-              value={filter.city || ''}
-              onChange={(e) => setFilter({ ...filter, city: e.target.value })}
-              placeholder="BERLIN"
-              style={{
-                height: '46px',
-                fontSize: '15px',
-                padding: '0 14px',
-                borderRadius: '14px',
-                border: '1px solid #cbd5e1',
-                background: 'rgba(255,255,255,0.72)',
-                outline: 'none',
-              }}
-            />
-          </label>
-
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 700 }}>Study Mode</span>
-            <select
-              value={filter.studyMode || ''}
-              onChange={(e) =>
-                setFilter({
-                  ...filter,
-                  studyMode: (e.target.value || undefined) as UserSearchFilter['studyMode'],
-                })
-              }
-              style={{
-                height: '46px',
-                fontSize: '15px',
-                padding: '0 14px',
-                borderRadius: '14px',
-                border: '1px solid #cbd5e1',
-                background: 'rgba(255,255,255,0.72)',
-                outline: 'none',
-              }}
-            >
-              <option value="">Any</option>
-              <option value="ONLINE">ONLINE</option>
-              <option value="OFFLINE">OFFLINE</option>
-              <option value="BOTH">BOTH</option>
-            </select>
-          </label>
-
           <div
-            className="button-row align-end"
             style={{
-              gap: '10px',
-              flexWrap: 'nowrap',
+              display: 'grid',
+              gridTemplateColumns: '1.2fr 1fr 1fr auto',
+              gap: '24px',
+              alignItems: 'end',
             }}
           >
-            <button
-              className="primary-button"
-              onClick={() => void loadUsers(filter)}
-              style={{
-                height: '46px',
-                padding: '0 18px',
-                borderRadius: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 8px 20px rgba(59,130,246,0.22)',
-              }}
-            >
-              <Search size={16} />
-              Search
-            </button>
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 700 }}>Keyword</span>
+              <input
+                value={filter.keyword || ''}
+                onChange={(e) => setFilter({ ...filter, keyword: e.target.value })}
+                placeholder="bio or degree"
+                style={{
+                  height: '56px',
+                  fontSize: '18px',
+                  padding: '0 20px',
+                  borderRadius: '20px',
+                  border: '1px solid #cbd5e1',
+                  background: 'rgba(255,255,255,0.72)',
+                  outline: 'none',
+                }}
+              />
+            </label>
 
-            <button
-              className="secondary-button"
-              onClick={() => {
-                setFilter(initialFilter);
-                void loadUsers({});
-              }}
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 700 }}>City</span>
+              <input
+                value={filter.city || ''}
+                onChange={(e) => setFilter({ ...filter, city: e.target.value })}
+                placeholder="Berlin"
+                style={{
+                  height: '56px',
+                  fontSize: '18px',
+                  padding: '0 20px',
+                  borderRadius: '20px',
+                  border: '1px solid #cbd5e1',
+                  background: 'rgba(255,255,255,0.72)',
+                  outline: 'none',
+                }}
+              />
+            </label>
+
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 700 }}>Study Mode</span>
+              <select
+                value={filter.studyMode || ''}
+                onChange={(e) =>
+                  setFilter({
+                    ...filter,
+                    studyMode: (e.target.value || undefined) as UserSearchFilter['studyMode'],
+                  })
+                }
+                style={{
+                  height: '56px',
+                  fontSize: '18px',
+                  padding: '0 20px',
+                  borderRadius: '20px',
+                  border: '1px solid #cbd5e1',
+                  background: 'rgba(255,255,255,0.72)',
+                  outline: 'none',
+                }}
+              >
+                <option value="">Any</option>
+                <option value="ONLINE">ONLINE</option>
+                <option value="OFFLINE">OFFLINE</option>
+                <option value="BOTH">BOTH</option>
+              </select>
+            </label>
+
+            <div
               style={{
-                height: '46px',
-                padding: '0 18px',
-                borderRadius: '14px',
-                background: '#e2e8f0',
-                border: 'none',
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'end',
+                flexWrap: 'nowrap',
               }}
             >
-              Reset
-            </button>
+              <button
+                className="primary-button"
+                onClick={() => void loadUsers(filter)}
+                style={{
+                  height: '56px',
+                  padding: '0 22px',
+                  borderRadius: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: '0 8px 20px rgba(59,130,246,0.22)',
+                  fontSize: '16px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Search size={18} />
+                Search
+              </button>
+
+              <button
+                className="secondary-button"
+                onClick={() => {
+                  setFilter(initialFilter);
+                  void loadUsers({});
+                }}
+                style={{
+                  height: '56px',
+                  padding: '0 22px',
+                  borderRadius: '18px',
+                  background: '#dfe7f1',
+                  border: 'none',
+                  fontSize: '16px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       </div>
