@@ -71,8 +71,8 @@ export const api = {
     });
   },
 
-  async getDiscoverUsers(userId: number) {
-    return request<User[]>(`/api/discover/${userId}`);
+  async getDiscoverUsers() {
+    return request<User[]>(`/api/discover`);
   },
   async register(payload: RegisterRequest) {
     return request<User>('/api/auth/register', {

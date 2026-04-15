@@ -30,7 +30,7 @@ export function DiscoverPage({ currentUser, onStartChat }: DiscoverPageProps) {
       const cleaned = payload || {};
       const data = Object.values(cleaned).some(Boolean)
         ? await api.searchUsers(cleaned)
-        : await api.getDiscoverUsers(currentUser.id);
+        : await api.getDiscoverUsers();
 
       setUsers(data.filter((user) => user.id !== currentUser.id));
       setCurrentIndex(0);

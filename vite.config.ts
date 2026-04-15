@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    allowedHosts: [
+      'unsubtly-decathlon-barricade.ngrok-free.dev'
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
